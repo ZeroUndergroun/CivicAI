@@ -1,0 +1,7 @@
+state_name,state_fips_code,date,confirmed_cases,deaths
+Alabama,01,2020-03-01,1,0
+Alabama,01,2020-03-02,3,0
+Alabama,01,2020-03-03,6,0
+Alaska,02,2020-03-01,0,0
+Alaska,02,2020-03-02,1,0
+Alaska,02,2020-03-03,2,0
