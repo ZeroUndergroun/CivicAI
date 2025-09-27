@@ -1,52 +1,59 @@
-import os
-import argparse
+# data/bigquery_client.py
+
 from google.cloud import bigquery
+from google.api_core.exceptions import GoogleAPIError
+import pandas as pd
 
 
-def run_query(query: str, sa_path: str = None):
-    """Run a BigQuery SQL query and return a pandas DataFrame.
+class BigQueryClient:
+    def __init__(self, project_id=None):
+        """
+        Initialize the BigQuery client.
 
-    Auth behavior:
-    - If `sa_path` is provided, sets `GOOGLE_APPLICATION_CREDENTIALS` to it for the process.
-    - Otherwise, uses Application Default Credentials (ADC) which works when `gcloud auth application-default login` is configured or when running on GCP.
-    """
-    # If service account provided, ensure file exists and set env var for the client library
-    if sa_path:
-        if not os.path.isfile(sa_path):
-            raise FileNotFoundError(f"Service account file not found: {sa_path}")
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = sa_path
+        Args:
+            project_id (str, optional): GCP project ID. 
+                                        If None, uses default credentials/project.
+        """
+        try:
+            self.client = bigquery.Client(project=project_id)
+            print(f"✅ Connected to BigQuery (project={self.client.project})")
+        except Exception as e:
+            raise RuntimeError(f"❌ Failed to initialize BigQuery client: {e}")
 
-    try:
-     client = bigquery.Client()
-    except Exception:
-    # Any error from the client likely indicates missing credentials/configuration.
-        raise RuntimeError(
-      "Could not find Google Cloud credentials. "
-    """BigQuery helper with a guest/demo fallback.
+    def run_query_dataframe(self, query: str) -> pd.DataFrame:
+        """
+        Run a query and return results as a Pandas DataFrame.
 
-    Usage:
-      - Guest/demo: python data/bigquery_client.py --guest
-      - With service account JSON: python data/bigquery_client.py --sa path/to/sa.json
+        Args:
+            query (str): SQL query string.
 
-    Guest mode loads `demo/sample_covid.csv` from the repository so contributors and
-    hackathon participants can run the tool without Google credentials.
-    """
+        Returns:
+            pd.DataFrame: Query results.
+        """
+        try:
+            results = self.client.query(query)
+            df = results.to_dataframe()
+            return df
+        except GoogleAPIError as e:
+            raise RuntimeError(f"❌ BigQuery API error: {e}")
+        except Exception as e:
+            raise RuntimeError(f"❌ Unexpected error in run_query_dataframe: {e}")
 
-    import os
-    import argparse
-    from typing import Optional
+    def run_query_dict(self, query: str) -> list[dict]:
+        """
+        Run a query and return results as a list of dictionaries.
 
-    """BigQuery helper with a guest/demo fallback.
+        Args:
+            query (str): SQL query string.
 
-    Usage:
-      - Guest/demo: python data/bigquery_client.py --guest
-      - With service account JSON: python data/bigquery_client.py --sa path/to/sa.json
-
-    Guest mode loads `demo/sample_covid.csv` from the repository so contributors and
-    hackathon participants can run the tool without Google credentials.
-    """
-
-    import os
-    import argparse
-    """Cleaned placeholder file. The real implementation will be re-added next."""
-    print("cleaned")
+        Returns:
+            list[dict]: Query results.
+        """
+        try:
+            results = self.client.query(query)
+            rows = [dict(row) for row in results]
+            return rows
+        except GoogleAPIError as e:
+            raise RuntimeError(f"❌ BigQuery API error: {e}")
+        except Exception as e:
+            raise RuntimeError(f"❌ Unexpected error in run_query_dict: {e}")
