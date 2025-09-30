@@ -53,12 +53,12 @@ CivicAI/
 ## 🎬 Demo & Getting Started
 
 ### Quick Demo
-Check out our [60-second demo video](https://youtu.be/your-video-id-here) to see CivicAI in action, answering real questions about public data and generating instant visualizations.
+Check out our [Demo Video](https://youtu.be/rEJTBHzLuAE) to see CivicAI in action, answering real questions about public data and generating instant visualizations.
 
 ### Local Development
 bash
 # Clone the repository
-git clone https://github.com/your-username/CivicAI.git
+git clone https://github.com/ZeroUndergroun/CivicAI.git
 
 # Install dependencies
 cd CivicAI
